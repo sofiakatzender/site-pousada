@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservas</title>
+
+<style>
+:root {
+  --azul: #0a2342;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  padding-top: 90px;
+}
+
+/* ===== HEADER ===== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: var(--azul);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  color: white;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+}
+
+.topbar-right {
+  display: flex;
+  gap: 10px;
+  margin-top: -15px;
+}
+
+.topbar-btn {
+  background: white;
+  color: var(--azul);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ===== CONTEÚDO ===== */
+.container {
+  max-width: 520px;
+  margin: auto;
+}
+
+h2 {
+  text-align: center;
+  color: var(--azul);
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--azul);
+  margin-top: 10px;
+  display: block;
+}
+
+input, button {
+  width: 95%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--azul);
+  font-size: 15px;
+}
+
+button {
+  background: var(--azul);
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+#btnSalvar {
+  display: block;
+  width: 100%;
+  margin: 16px auto 0 auto;
+}
+
+
+/* ===== LISTA ===== */
+.reserva {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  margin-bottom: 12px;
+}
+
+.btn-small {
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 13px;
+}
+
+.editar { background: #1565c0; }
+.excluir { background: #c62828; }
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div><strong>Portal do Sabiá Maresias</strong></div>
+  <div class="topbar-right">
+    <button class="topbar-btn" onclick="window.location.href='reservas.html'">Reservas</button>
+    <button class="topbar-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
+    <button class="topbar-btn" onclick="logout()">Sair</button>
+  </div>
+</div>
+
+<div class="container">
+
+<h2>Cadastrar / Editar Reserva</h2>
+
+<div class="card">
+  <label>Nome do hóspede</label>
+  <input id="nome">
+
+  <label>Entrada</label>
+  <input id="entrada" type="date">
+
+  <label>Saída</label>
+  <input id="saida" type="date">
+
+  <label>Número do quarto</label>
+  <input id="quarto">
+
+  <label>Quantidade de hóspedes</label>
+  <input id="hospedes">
+
+  <label>Valor (R$)</label>
+  <input id="valor">
+
+  <button id="btnSalvar">Salvar Reserva</button>
+</div>
+
+<h2>Reservas Registradas</h2>
+<div id="listaReservas"></div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+/* ===== FIREBASE CONFIG ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAFPC12iKSPZ5Y6-YtovvDfku7-EHNjX2s",
+  authDomain: "pousadasistemaktz.firebaseapp.com",
+  projectId: "pousadasistemaktz",
+  storageBucket: "pousadasistemaktz.firebasestorage.app",
+  messagingSenderId: "489196675670",
+  appId: "1:489196675670:web:f377d0fc784d6552d551f7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let idEdicao = null;
+
+/* ===== LOGIN ===== */
+onAuthStateChanged(auth, user => {
+  if (!user) location.href = "index.html";
+  carregar();
+});
+
+/* ===== LOGOUT ===== */
+window.logout = () => signOut(auth).then(()=>location.href="index.html");
+
+/* ===== MÁSCARA R$ 1.000,00 ===== */
+valor.addEventListener("input", () => {
+  let v = valor.value.replace(/\D/g, "");
+  if (!v) return valor.value = "";
+  v = (v / 100).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  valor.value = "R$ " + v;
+});
+
+/* ===== SALVAR ===== */
+btnSalvar.onclick = async () => {
+  if (!nome.value || !entrada.value || !saida.value || !quarto.value || !hospedes.value || !valor.value) {
+    alert("Preencha todos os campos");
+    return;
+  }
+
+  const dados = {
+    nome: nome.value,
+    entrada: entrada.value,
+    saida: saida.value,
+    quarto: quarto.value,
+    hospedes: hospedes.value,
+    valor: valor.value,
+    userId: auth.currentUser.uid
+  };
+
+  if (idEdicao) {
+    await updateDoc(doc(db,"reservas",idEdicao), dados);
+    idEdicao = null;
+  } else {
+    await addDoc(collection(db,"reservas"), dados);
+  }
+
+  limpar();
+  carregar();
+};
+
+function limpar(){
+  nome.value="";
+  entrada.value="";
+  saida.value="";
+  quarto.value="";
+  hospedes.value="";
+  valor.value="";
+}
+
+/* ===== LISTAR ===== */
+async function carregar(){
+  listaReservas.innerHTML="";
+  const q = query(collection(db,"reservas"), where("userId","==",auth.currentUser.uid));
+  const snap = await getDocs(q);
+
+  snap.forEach(d=>{
+    const r=d.data();
+    listaReservas.innerHTML+=`
+      <div class="reserva">
+        <strong>${r.nome}</strong><br>
+        ${r.entrada} → ${r.saida}<br>
+        Quarto ${r.quarto} | ${r.hospedes} hóspedes<br>
+        Valor: ${r.valor}<br><br>
+        <button class="btn-small editar" onclick='editar("${d.id}", ${JSON.stringify(r)})'>Editar</button>
+        <button class="btn-small excluir" onclick="excluir('${d.id}')">Excluir</button>
+      </div>`;
+  });
+}
+
+/* ===== EDITAR ===== */
+window.editar=(id,r)=>{
+  idEdicao=id;
+  nome.value=r.nome;
+  entrada.value=r.entrada;
+  saida.value=r.saida;
+  quarto.value=r.quarto;
+  hospedes.value=r.hospedes;
+  valor.value=r.valor;
+}
+
+/* ===== EXCLUIR ===== */
+window.excluir=async id=>{
+  if(confirm("Excluir reserva?")){
+    await deleteDoc(doc(db,"reservas",id));
+    carregar();
+  }
+}
+</script>
+
+</body>
+</html>

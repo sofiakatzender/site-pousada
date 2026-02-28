@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+:root {
+  --azul: #0a2342;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  padding-top: 90px;
+}
+
+/* ===== HEADER ===== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: var(--azul);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  color: white;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+}
+
+.topbar-right {
+  display: flex;
+  gap: 10px;
+  margin-top: -6px;
+}
+
+.topbar-btn {
+  background: white;
+  color: var(--azul);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* ===== CONTEÚDO ===== */
+.container {
+  max-width: 1000px;
+  margin: auto;
+}
+
+h2 {
+  text-align: center;
+  color: var(--azul);
+  margin-bottom: 20px;
+}
+
+/* ===== CARDS ===== */
+.cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  min-width: 220px;
+  text-align: center;
+}
+
+.card h3 {
+  margin: 0;
+  color: var(--azul);
+}
+
+.card p {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* ===== TABELA ===== */
+.table-box {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+}
+
+.btn-export {
+  background: var(--azul);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #cfd8dc;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background: var(--azul);
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== HEADER ===== -->
+
+<div class="topbar">
+  <div><strong>Portal do Sabiá Maresias</strong></div>
+  <div class="topbar-right">
+    <button class="topbar-btn" onclick="window.location.href='reservas.html'">Reservas</button>
+    <button class="topbar-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
+    <button class="topbar-btn" onclick="logout()">Sair</button>
+  </div>
+</div>
+
+<div class="container">
+
+<h2>Dashboard da Pousada</h2>
+
+<div class="cards">
+  <div class="card">
+    <h3>Total de Reservas</h3>
+    <p id="totalReservas">0</p>
+  </div>
+
+  <div class="card">
+    <h3>Total Faturado</h3>
+    <p id="totalFaturado">R$ 0,00</p>
+  </div>
+
+  <div class="card">
+    <h3>Quartos Ocupados</h3>
+    <p id="quartosOcupados">0</p>
+  </div>
+</div>
+
+<div class="table-box">
+  <button class="btn-export" onclick="exportExcel()">Exportar Excel</button>
+
+  <table id="tabelaReservas">
+    <thead>
+      <tr>
+        <th>Hóspede</th>
+        <th>Entrada</th>
+        <th>Saída</th>
+        <th>Quarto</th>
+        <th>Hóspedes</th>
+        <th>Valor</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAFPC12iKSPZ5Y6-YtovvDfku7-EHNjX2s",
+  authDomain: "pousadasistemaktz.firebaseapp.com",
+  projectId: "pousadasistemaktz",
+  storageBucket: "pousadasistemaktz.firebasestorage.app",
+  messagingSenderId: "489196675670",
+  appId: "1:489196675670:web:f377d0fc784d6552d551f7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+window.logout = () => signOut(auth).then(() => location.href = "index.html");
+
+onAuthStateChanged(auth, async user => {
+  if (!user) location.href = "index.html";
+
+  const q = query(collection(db,"reservas"), where("userId","==",user.uid));
+  const snap = await getDocs(q);
+
+  let total = 0;
+  let faturado = 0;
+  let quartos = new Set();
+
+  const tbody = document.querySelector("#tabelaReservas tbody");
+  tbody.innerHTML = "";
+
+  snap.forEach(d => {
+    const r = d.data();
+    total++;
+    quartos.add(r.quarto);
+
+    const valorNum = parseFloat(
+      r.valor.replace(/[^\d,]/g,"").replace(",",".")
+    ) || 0;
+    faturado += valorNum;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.nome}</td>
+        <td>${r.entrada}</td>
+        <td>${r.saida}</td>
+        <td>${r.quarto}</td>
+        <td>${r.hospedes}</td>
+        <td>${r.valor}</td>
+      </tr>
+    `;
+  });
+
+  totalReservas.innerText = total;
+  totalFaturado.innerText = "R$ " + faturado.toFixed(2).replace(".",",");
+  quartosOcupados.innerText = quartos.size;
+});
+
+window.exportExcel = () => {
+  const wb = XLSX.utils.table_to_book(
+    document.getElementById("tabelaReservas"),
+    { sheet: "Reservas" }
+  );
+  XLSX.writeFile(wb, "dashboard_reservas.xlsx");
+};
+
+
+</script>
+
+</body>
+</html>

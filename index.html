@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Pousada</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#0a2342;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+h1{color:white;margin-bottom:0;font-size:28px;}
+h3{color:#d0d8ff;margin-top:5px;margin-bottom:20px;font-weight:300;}
+
+.card{
+  background:white;
+  padding:30px;
+  width:340px;
+  border-radius:14px;
+  box-shadow:0 4px 18px rgba(0,0,0,.3);
+  text-align:center;
+}
+
+.card h2{color:#0a2342;}
+
+input{
+  width:95%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:6px;
+  border:1px solid #0a2342;
+  font-size:15px;
+}
+
+button{
+  width:95%;
+  padding:12px;
+  margin:10px auto;
+  border-radius:8px;
+  background:#0a2342;
+  color:white;
+  border:none;
+  cursor:pointer;
+  font-size:16px;
+}
+
+button:hover{background:#091b33;}
+
+.link{
+  margin-top:12px;
+  color:#0a2342;
+  cursor:pointer;
+  display:block;
+  font-weight:bold;
+}
+
+.alerta{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:14px 22px;
+  border-radius:8px;
+  color:white;
+  font-size:16px;
+  display:none;
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+  z-index:9999;
+}
+
+.verde{background:#2e7d32;}
+.azul{background:#1565c0;}
+</style>
+</head>
+
+<body>
+
+<h1>Portal do Sabiá Maresias</h1>
+<h3>Portal Administrativo</h3>
+
+<div id="alerta" class="alerta"></div>
+
+<div class="card">
+  <h2 id="title">Login</h2>
+
+  <input type="email" id="email" placeholder="E-mail">
+  <input type="password" id="senha" placeholder="Senha">
+
+  <button id="btnLogin">Entrar</button>
+  <button id="btnCadastro" style="display:none;">Criar conta</button>
+
+  <span class="link" id="linkModo">Não tem conta? Cadastre-se</span>
+  <span class="link" id="linkSenha">Esqueceu a senha?</span>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+/* ===== CONFIG FIREBASE ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAFPC12iKSPZ5Y6-YtovvDfku7-EHNjX2s",
+  authDomain: "pousadasistemaktz.firebaseapp.com",
+  projectId: "pousadasistemaktz",
+  storageBucket: "pousadasistemaktz.firebasestorage.app",
+  messagingSenderId: "489196675670",
+  appId: "1:489196675670:web:f377d0fc784d6552d551f7"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* ===== ELEMENTOS ===== */
+const email = document.getElementById("email");
+const senha = document.getElementById("senha");
+const btnLogin = document.getElementById("btnLogin");
+const btnCadastro = document.getElementById("btnCadastro");
+const linkModo = document.getElementById("linkModo");
+const linkSenha = document.getElementById("linkSenha");
+const title = document.getElementById("title");
+
+let modoCadastro = false;
+
+/* ===== ALERTA ===== */
+function mostrarMensagem(texto, tipo){
+  const box = document.getElementById("alerta");
+  box.innerText = texto;
+  box.className = "alerta " + (tipo==="verde"?"verde":"azul");
+  box.style.display="block";
+  setTimeout(()=>box.style.display="none",3000);
+}
+
+/* ===== AUTO LOGIN ===== */
+onAuthStateChanged(auth,user=>{
+  if(user){
+    window.location.href="reservas.html";
+  }
+});
+
+/* ===== TROCAR MODO ===== */
+linkModo.onclick=()=>{
+  modoCadastro=!modoCadastro;
+
+  title.innerText=modoCadastro?"Criar Conta":"Login";
+  btnLogin.style.display=modoCadastro?"none":"block";
+  btnCadastro.style.display=modoCadastro?"block":"none";
+  linkSenha.style.display=modoCadastro?"none":"block";
+
+  linkModo.innerText=
+    modoCadastro?"Já tem conta? Faça login":"Não tem conta? Cadastre-se";
+};
+
+/* ===== LOGIN ===== */
+btnLogin.onclick=async()=>{
+  if(!email.value || !senha.value){
+    mostrarMensagem("Preencha email e senha","azul");
+    return;
+  }
+
+  try{
+    await signInWithEmailAndPassword(auth,email.value,senha.value);
+    mostrarMensagem("Login realizado ✔","verde");
+    setTimeout(()=>location.href="reservas.html",700);
+  }catch(e){
+    mostrarMensagem("Erro: "+e.message,"azul");
+    console.error(e);
+  }
+};
+
+/* ===== CADASTRO ===== */
+btnCadastro.onclick=async()=>{
+  try{
+    await createUserWithEmailAndPassword(auth,email.value,senha.value);
+    mostrarMensagem("Conta criada ✔","verde");
+    setTimeout(()=>location.href="reservas.html",700);
+  }catch(e){
+    mostrarMensagem("Erro: "+e.message,"azul");
+  }
+};
+
+/* ===== RESET SENHA ===== */
+linkSenha.onclick=async()=>{
+  if(!email.value){
+    mostrarMensagem("Digite o email primeiro","azul");
+    return;
+  }
+
+  try{
+    await sendPasswordResetEmail(auth,email.value);
+    mostrarMensagem("Email de recuperação enviado","verde");
+  }catch(e){
+    mostrarMensagem(e.message,"azul");
+  }
+};
+</script>
+
+</body>
+</html>
