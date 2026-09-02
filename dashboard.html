@@ -3,138 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+<title>Dashboard — Portal do Sabiá Maresias</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-<style>
-:root {
-  --azul: #0a2342;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
-  padding-top: 90px;
-}
-
-/* ===== HEADER ===== */
-.topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
-  background: var(--azul);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  color: white;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.3);
-}
-
-.topbar-right {
-  display: flex;
-  gap: 10px;
-  margin-top: -6px;
-}
-
-.topbar-btn {
-  background: white;
-  color: var(--azul);
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-/* ===== CONTEÚDO ===== */
-.container {
-  max-width: 1000px;
-  margin: auto;
-}
-
-h2 {
-  text-align: center;
-  color: var(--azul);
-  margin-bottom: 20px;
-}
-
-/* ===== CARDS ===== */
-.cards {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 30px;
-}
-
-.card {
-  background: white;
-  padding: 25px;
-  border-radius: 14px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
-  min-width: 220px;
-  text-align: center;
-}
-
-.card h3 {
-  margin: 0;
-  color: var(--azul);
-}
-
-.card p {
-  font-size: 24px;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-/* ===== TABELA ===== */
-.table-box {
-  background: white;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
-}
-
-.btn-export {
-  background: var(--azul);
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 15px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  border: 1px solid #cfd8dc;
-  padding: 10px;
-  text-align: center;
-}
-
-th {
-  background: var(--azul);
-  color: white;
-}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="app-body">
 
 <!-- ===== HEADER ===== -->
 
 <div class="topbar">
-  <div><strong>Portal do Sabiá Maresias</strong></div>
+  <div class="brand">Portal do Sabiá Maresias</div>
   <div class="topbar-right">
     <button class="topbar-btn" onclick="window.location.href='reservas.html'">Reservas</button>
     <button class="topbar-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
@@ -142,22 +25,22 @@ th {
   </div>
 </div>
 
-<div class="container">
+<div class="container wide">
 
-<h2>Dashboard da Pousada</h2>
+<h2 class="page-title">Dashboard da Pousada</h2>
 
 <div class="cards">
-  <div class="card">
+  <div class="stat-card">
     <h3>Total de Reservas</h3>
     <p id="totalReservas">0</p>
   </div>
 
-  <div class="card">
+  <div class="stat-card">
     <h3>Total Faturado</h3>
     <p id="totalFaturado">R$ 0,00</p>
   </div>
 
-  <div class="card">
+  <div class="stat-card">
     <h3>Quartos Ocupados</h3>
     <p id="quartosOcupados">0</p>
   </div>

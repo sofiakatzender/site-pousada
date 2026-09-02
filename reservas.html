@@ -3,130 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reservas</title>
+<title>Reservas — Portal do Sabiá Maresias</title>
 
-<style>
-:root {
-  --azul: #0a2342;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
-  padding-top: 90px;
-}
-
-/* ===== HEADER ===== */
-.topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
-  background: var(--azul);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  color: white;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.3);
-}
-
-.topbar-right {
-  display: flex;
-  gap: 10px;
-  margin-top: -15px;
-}
-
-.topbar-btn {
-  background: white;
-  color: var(--azul);
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* ===== CONTEÚDO ===== */
-.container {
-  max-width: 520px;
-  margin: auto;
-}
-
-h2 {
-  text-align: center;
-  color: var(--azul);
-}
-
-.card {
-  background: white;
-  padding: 25px;
-  border-radius: 14px;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
-  margin-bottom: 30px;
-}
-
-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--azul);
-  margin-top: 10px;
-  display: block;
-}
-
-input, button {
-  width: 95%;
-  padding: 12px;
-  margin-top: 6px;
-  border-radius: 8px;
-  border: 1px solid var(--azul);
-  font-size: 15px;
-}
-
-button {
-  background: var(--azul);
-  color: white;
-  border: none;
-  cursor: pointer;
-  margin-top: 15px;
-}
-
-#btnSalvar {
-  display: block;
-  width: 100%;
-  margin: 16px auto 0 auto;
-}
-
-
-/* ===== LISTA ===== */
-.reserva {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  margin-bottom: 12px;
-}
-
-.btn-small {
-  padding: 7px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  color: white;
-  font-size: 13px;
-}
-
-.editar { background: #1565c0; }
-.excluir { background: #c62828; }
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="app-body">
 
 <div class="topbar">
-  <div><strong>Portal do Sabiá Maresias</strong></div>
+  <div class="brand">Portal do Sabiá Maresias</div>
   <div class="topbar-right">
     <button class="topbar-btn" onclick="window.location.href='reservas.html'">Reservas</button>
     <button class="topbar-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
@@ -136,9 +23,9 @@ button {
 
 <div class="container">
 
-<h2>Cadastrar / Editar Reserva</h2>
+<h2 class="page-title">Cadastrar / Editar Reserva</h2>
 
-<div class="card">
+<div class="panel">
   <label>Nome do hóspede</label>
   <input id="nome">
 
@@ -160,7 +47,7 @@ button {
   <button id="btnSalvar">Salvar Reserva</button>
 </div>
 
-<h2>Reservas Registradas</h2>
+<h2 class="page-title">Reservas Registradas</h2>
 <div id="listaReservas"></div>
 
 </div>
