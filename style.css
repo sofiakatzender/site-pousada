@@ -24,8 +24,13 @@
 
 * { box-sizing: border-box; }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: 'Work Sans', Arial, sans-serif;
   background: var(--sand);
   color: var(--ink);
@@ -147,6 +152,7 @@ h1, h2, h3, .brand {
 
 input {
   width: 100%;
+  min-width: 0;
   padding: 12px 14px;
   margin: 8px 0;
   border-radius: var(--radius-sm);
