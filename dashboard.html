@@ -46,6 +46,20 @@
   </div>
 </div>
 
+<div class="table-box" style="margin-bottom:28px;">
+  <h2 class="page-title" style="margin-bottom:14px;">Faturamento por Mês</h2>
+  <table id="tabelaMensal">
+    <thead>
+      <tr>
+        <th>Mês</th>
+        <th>Reservas</th>
+        <th>Faturado</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
 <div class="table-box">
   <button class="btn-export" onclick="exportExcel()">Exportar Excel</button>
 
@@ -95,6 +109,7 @@ onAuthStateChanged(auth, async user => {
   let total = 0;
   let faturado = 0;
   let quartos = new Set();
+  let porMes = {}; // agrupa faturamento por mês de check-in (entrada)
 
   const tbody = document.querySelector("#tabelaReservas tbody");
   tbody.innerHTML = "";
@@ -117,6 +132,31 @@ onAuthStateChanged(auth, async user => {
         <td>${r.quarto}</td>
         <td>${r.hospedes}</td>
         <td>${r.valor}</td>
+      </tr>
+    `;
+
+    if (r.entrada) {
+      const chave = r.entrada.slice(0, 7); // "YYYY-MM"
+      if (!porMes[chave]) porMes[chave] = { reservas: 0, faturado: 0 };
+      porMes[chave].reservas++;
+      porMes[chave].faturado += valorNum;
+    }
+  });
+
+  const nomesMeses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+                       "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  const tbodyMensal = document.querySelector("#tabelaMensal tbody");
+  tbodyMensal.innerHTML = "";
+
+  Object.keys(porMes).sort().forEach(chave => {
+    const [ano, mes] = chave.split("-");
+    const nomeMes = nomesMeses[parseInt(mes, 10) - 1] + "/" + ano;
+    const dados = porMes[chave];
+    tbodyMensal.innerHTML += `
+      <tr>
+        <td>${nomeMes}</td>
+        <td>${dados.reservas}</td>
+        <td>R$ ${dados.faturado.toFixed(2).replace(".", ",")}</td>
       </tr>
     `;
   });
