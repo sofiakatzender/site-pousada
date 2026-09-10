@@ -41,7 +41,7 @@
   </div>
 
   <div class="stat-card">
-    <h3>Quartos Ocupados</h3>
+    <h3>Quartos Ocupados Hoje</h3>
     <p id="quartosOcupados">0</p>
   </div>
 </div>
@@ -108,8 +108,10 @@ onAuthStateChanged(auth, async user => {
 
   let total = 0;
   let faturado = 0;
-  let quartos = new Set();
+  let quartosHoje = new Set();
   let porMes = {}; // agrupa faturamento por mês de check-in (entrada)
+
+  const hoje = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
   const tbody = document.querySelector("#tabelaReservas tbody");
   tbody.innerHTML = "";
@@ -117,7 +119,12 @@ onAuthStateChanged(auth, async user => {
   snap.forEach(d => {
     const r = d.data();
     total++;
-    quartos.add(r.quarto);
+
+    // Ocupado hoje: entrada já passou (ou é hoje) e saída ainda não chegou.
+    // No dia da saída (12h) o quarto já é considerado livre.
+    if (r.entrada <= hoje && hoje < r.saida) {
+      quartosHoje.add(r.quarto);
+    }
 
     const valorNum = parseFloat(
       r.valor.replace(/[^\d,]/g,"").replace(",",".")
@@ -163,7 +170,7 @@ onAuthStateChanged(auth, async user => {
 
   totalReservas.innerText = total;
   totalFaturado.innerText = "R$ " + faturado.toFixed(2).replace(".",",");
-  quartosOcupados.innerText = quartos.size;
+  quartosOcupados.innerText = quartosHoje.size;
 });
 
 window.exportExcel = () => {
