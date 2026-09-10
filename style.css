@@ -74,6 +74,8 @@ h1, h2, h3, .brand {
   font-family: 'Work Sans', Arial, sans-serif;
   font-size: 14px;
   cursor: pointer;
+  width: auto;
+  flex: 0 0 auto;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
@@ -321,6 +323,7 @@ label {
   padding: 22px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+  overflow-x: auto;
 }
 
 .btn-export {
@@ -342,6 +345,13 @@ table {
   border-collapse: collapse;
 }
 
+/* A tabela de reservas tem 6 colunas — em telas estreitas ela ganha
+   scroll horizontal dentro do .table-box em vez de espremer o texto.
+   A tabela de faturamento mensal tem só 3 colunas e cabe sem scroll. */
+#tabelaReservas {
+  min-width: 640px;
+}
+
 th, td {
   border: 1px solid #E6DDCA;
   padding: 11px;
@@ -357,3 +367,119 @@ th {
 }
 
 tr:nth-child(even) td { background: var(--sand); }
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+
+/* ===== Tablets e telas médias ===== */
+@media (max-width: 768px) {
+
+  .topbar {
+    height: auto;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .topbar .brand {
+    font-size: 17px;
+  }
+
+  .topbar-right {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .topbar-btn {
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+
+  .app-body {
+    padding-top: 128px;
+  }
+
+  .container,
+  .container.wide {
+    padding: 0 16px 32px;
+  }
+
+  .panel,
+  .table-box {
+    padding: 18px;
+  }
+
+  .cards {
+    gap: 14px;
+  }
+
+  .stat-card {
+    min-width: 160px;
+    padding: 20px;
+  }
+
+  .stat-card p {
+    font-size: 24px;
+  }
+
+  h2.page-title {
+    font-size: 21px;
+  }
+}
+
+/* ===== Celulares ===== */
+@media (max-width: 480px) {
+
+  .login-page {
+    padding: 16px;
+  }
+
+  .login-page h1 {
+    font-size: 23px;
+  }
+
+  .login-page h3 {
+    font-size: 14px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 340px;
+    padding: 22px;
+  }
+
+  .topbar .brand {
+    font-size: 15px;
+  }
+
+  .topbar-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .app-body {
+    padding-top: 138px;
+  }
+
+  .stat-card {
+    min-width: 100%;
+  }
+
+  th, td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .reserva {
+    padding: 14px;
+  }
+
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
