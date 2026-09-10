@@ -168,6 +168,17 @@ input:focus {
   outline-offset: 1px;
 }
 
+/* input[type="date"] no iOS tem um "conteúdo interno" (dia/mês/ano + ícone)
+   que às vezes ignora min-width:0 e força a barra a ficar mais larga que
+   o container. -webkit-appearance:none tira esse comportamento nativo
+   problemático e deixa a barra obedecer o width:100% normalmente. */
+input[type="date"] {
+  min-width: 0;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 button {
   width: 100%;
   padding: 12px;
@@ -456,6 +467,15 @@ tr:nth-child(even) td { background: var(--sand); }
     width: 100%;
     max-width: 340px;
     padding: 22px;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  input[type="date"] {
+    padding: 12px 8px;
+    font-size: 14px;
   }
 
   .topbar .brand {
