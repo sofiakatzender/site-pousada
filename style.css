@@ -171,7 +171,7 @@ input:focus {
 /* input[type="date"] no iOS tem um "conteúdo interno" (dia/mês/ano + ícone)
    que pode ignorar min-width:0 e forçar a barra a ficar maior que as outras.
    Aqui ele usa o MESMO padding/fonte do input normal (pra ficar do mesmo
-   tamanho que "Nome do hóspede"), sem mexer na aparência nativa do campo. */
+   tamanho que "Nome do hóspede") e só ajusta o que evita o estouro. */
 input[type="date"] {
   width: 100%;
   min-width: 0;
@@ -179,6 +179,8 @@ input[type="date"] {
   box-sizing: border-box;
   padding: 12px 14px;
   font-size: 15px;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 button {
